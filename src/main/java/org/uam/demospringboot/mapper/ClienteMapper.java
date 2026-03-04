@@ -1,15 +1,31 @@
 package org.uam.demospringboot.mapper;
 
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import org.uam.demospringboot.dto.ClienteDTO;
 import org.uam.demospringboot.model.Cliente;
 
-@Mapper(componentModel = "spring")
-public interface ClienteMapper {
-    ClienteMapper INSTANCE = Mappers.getMapper(ClienteMapper.class);
+@Mapper(config = CentralMapperConfig.class,
+    uses = {GenericFieldMapper.class})
+public interface ClienteMapper extends GenericMapper<Cliente, ClienteDTO> {
 
-    ClienteDTO clienteToClienteDTO(Cliente entity);
+    @Override
+    @Mapping(target="id",source="dto.generico.id")
+    Cliente toEntity(ClienteDTO dto);
 
-    Cliente clienteDTOToCliente(ClienteDTO dto);
+    @Override
+    @Mapping(target = "generico",source="entity")
+    ClienteDTO toDto(Cliente entity);
+
+
+    @AfterMapping
+    default void mapGenericFields(
+            ClienteDTO dto,
+            @MappingTarget Cliente entity,
+            GenericFieldMapper genericFieldMapper) {
+
+        if (dto.generico() != null) {
+            genericFieldMapper.updateEntityFromGenericoDTO(dto.generico(), entity);
+        }
+    }
 }

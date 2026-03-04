@@ -1,20 +1,18 @@
 package org.uam.demospringboot.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="departamento")
 @Getter
 @Setter
 public class Departamento extends EntityBase{
-
+    @Column(unique=true)
     private String nombre;
 
     @OneToMany(mappedBy = "departamento")

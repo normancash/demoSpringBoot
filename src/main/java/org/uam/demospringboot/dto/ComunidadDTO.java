@@ -1,10 +1,11 @@
 package org.uam.demospringboot.dto;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record ComunidadDTO(
-        UUID id,
+        GenericoDTO generico,
         String nombre,
-        UUID municipioId
+        UUID idMunicipio
 ) {
 }

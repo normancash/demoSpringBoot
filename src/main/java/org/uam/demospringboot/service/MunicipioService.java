@@ -1,6 +1,7 @@
 package org.uam.demospringboot.service;
 
 import org.springframework.stereotype.Service;
+import org.uam.demospringboot.dto.DepartamentoDTO;
 import org.uam.demospringboot.dto.MunicipioDTO;
 import org.uam.demospringboot.mapper.MunicipioMapper;
 import org.uam.demospringboot.model.Departamento;
@@ -26,20 +27,37 @@ public class MunicipioService {
     }
 
     public MunicipioDTO crear(MunicipioDTO municipioDTO) {
-        Departamento d = repositoryDepartamento.findById(municipioDTO.departamentoId())
+        Departamento d = repositoryDepartamento.findById(municipioDTO.idDepartamento())
                 .orElseThrow(() -> new RuntimeException("Departamento no encontrado"));
         Municipio m = mapper.toEntity(municipioDTO);
         m.setDepartamento(d);
-        return mapper.toDTO(repositoryMunicipio.save(m));
+        return mapper.toDto(repositoryMunicipio.save(m));
     }
 
     public List<MunicipioDTO> listarByDepartamento(UUID departamentoId) {
         return repositoryMunicipio.
                 findByDepartamento(departamentoId)
                 .stream()
-                .map(mapper::toDTO)
+                .map(mapper::toDto)
                 .toList();
 
+    }
+
+    public List<MunicipioDTO> listar() {
+        return mapper.toDtoList(repositoryMunicipio.findAll());
+    }
+
+    public MunicipioDTO update(UUID id, MunicipioDTO municipioDTO) {
+        MunicipioDTO dto = buscarById(id);
+        return mapper.toDto(repositoryMunicipio
+                .save(mapper.toEntity(municipioDTO)));
+    }
+
+    public MunicipioDTO buscarById(UUID id) {
+        return mapper.
+                toDto(this.repositoryMunicipio
+                        .findById(id)
+                        .orElseThrow(() -> new RuntimeException("Municipio no encontrado")));
     }
 
 }

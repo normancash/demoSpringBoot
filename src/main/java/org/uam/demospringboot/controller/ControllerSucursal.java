@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uam.demospringboot.dto.GenericoDTO;
 import org.uam.demospringboot.dto.SucursalDTO;
+import org.uam.demospringboot.mapper.SucursalMapper;
 import org.uam.demospringboot.model.Sucursal;
 import org.uam.demospringboot.service.IServiceSucursal;
 import org.uam.demospringboot.service.ServiceSucursal;
@@ -16,52 +17,31 @@ import java.util.UUID;
 public class ControllerSucursal {
 
     private final ServiceSucursal serviceSucursal;
+    private final SucursalMapper mapper;
 
-    public ControllerSucursal(ServiceSucursal serviceSucursal) {
+    public ControllerSucursal(ServiceSucursal serviceSucursal, SucursalMapper mapper) {
         this.serviceSucursal = serviceSucursal;
+        this.mapper = mapper;
     }
 
 
     @GetMapping("/all")
     public ResponseEntity<List<SucursalDTO>> getAll() {
         return ResponseEntity.ok(serviceSucursal.findAll().stream()
-                .map(entity->
-                   new SucursalDTO(
-                           new GenericoDTO(entity.getId()),
-                           entity.getNombre(),
-                           entity.getUbicacion(),
-                           entity.getDireccion(),
-                           entity.getTelefono(),
-                           entity.getEmail()
-                   )
-                ).toList()
+                 .map(mapper::toDto).toList()
         );
     }
 
     @PostMapping("/create")
     public ResponseEntity<SucursalDTO> save(@RequestBody Sucursal sucursal) {
         Sucursal entity = serviceSucursal.create(sucursal);
-        return ResponseEntity.ok(new SucursalDTO(
-                new GenericoDTO(entity.getId()),
-                entity.getNombre(),
-                entity.getUbicacion(),
-                entity.getDireccion(),
-                entity.getTelefono(),
-                entity.getEmail()
-        ) );
+        return ResponseEntity.ok(mapper.toDto(entity));
     }
 
     @PutMapping("/update")
     public ResponseEntity<SucursalDTO> update(@RequestBody Sucursal sucursal) {
         Sucursal entity = serviceSucursal.update(sucursal.getId(),sucursal);
-        return ResponseEntity.ok(new SucursalDTO(
-                new GenericoDTO(entity.getId()),
-                entity.getNombre(),
-                entity.getUbicacion(),
-                entity.getDireccion(),
-                entity.getTelefono(),
-                entity.getEmail()
-        ));
+        return ResponseEntity.ok(mapper.toDto(entity));
     }
 
     @DeleteMapping("/delete/{id}")

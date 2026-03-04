@@ -7,6 +7,7 @@ import org.uam.demospringboot.config.OnCreate;
 import org.uam.demospringboot.config.OnUpdate;
 import org.uam.demospringboot.dto.GenericoDTO;
 import org.uam.demospringboot.dto.UsuarioDTO;
+import org.uam.demospringboot.mapper.UsuarioMapper;
 import org.uam.demospringboot.model.Usuario;
 import org.uam.demospringboot.service.IServiceUsuario;
 import org.uam.demospringboot.service.ServiceUsuario;
@@ -19,9 +20,11 @@ import java.util.UUID;
 public class ControllerUsuario {
 
     private final ServiceUsuario serviceUsuario;
+    private final UsuarioMapper usuarioMapper;
 
-    public ControllerUsuario(ServiceUsuario serviceUsuario) {
+    public ControllerUsuario(ServiceUsuario serviceUsuario, UsuarioMapper usuarioMapper) {
         this.serviceUsuario = serviceUsuario;
+        this.usuarioMapper = usuarioMapper;
     }
 
     @GetMapping("/all")
@@ -29,17 +32,7 @@ public class ControllerUsuario {
         return ResponseEntity.ok(serviceUsuario.findAll()
                 .stream()
                 .map(
-                        entity->new UsuarioDTO(
-                                new GenericoDTO(entity.getId()),
-                                entity.getPrimerNombre(),
-                                entity.getSegundoNombre(),
-                                entity.getPrimerApellido(),
-                                entity.getSegundoApellido(),
-                                entity.getEmail(),
-                                entity.getTelefono(),
-                                entity.getDireccion(),
-                                entity.getCedula()
-                        )
+                   usuarioMapper::toDto
                 ).toList()
         );
     }
@@ -48,32 +41,13 @@ public class ControllerUsuario {
     public ResponseEntity<UsuarioDTO> createUsuario(@RequestBody
                                                @Validated(OnCreate.class) Usuario usuario) {
         Usuario entity = serviceUsuario.create(usuario);
-        return ResponseEntity.ok(new UsuarioDTO(
-                new GenericoDTO(entity.getId()),
-                entity.getPrimerNombre(),
-                entity.getSegundoNombre(),
-                entity.getPrimerApellido(),
-                entity.getSegundoApellido(),
-                entity.getEmail(),
-                entity.getTelefono(),
-                entity.getDireccion(),
-                entity.getCedula()
-        ));
+        return ResponseEntity.ok(usuarioMapper.toDto(entity));
     }
 
     @PutMapping("/update")
     public ResponseEntity<UsuarioDTO> update(@RequestBody @Validated(OnUpdate.class) Usuario usuario) {
         Usuario entity = serviceUsuario.update(usuario.getId(),usuario);
-        return ResponseEntity.ok(new UsuarioDTO(
-                new GenericoDTO(entity.getId()),
-                entity.getPrimerNombre(),
-                entity.getSegundoNombre(),
-                entity.getPrimerApellido(),
-                entity.getSegundoApellido(),
-                entity.getEmail(),
-                entity.getTelefono(),
-                entity.getDireccion(),
-                entity.getCedula()));
+        return ResponseEntity.ok(usuarioMapper.toDto(entity));
     }
 
     @DeleteMapping("/delete/{id}")

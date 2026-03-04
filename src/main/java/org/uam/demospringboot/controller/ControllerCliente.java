@@ -28,14 +28,14 @@ public class ControllerCliente {
     public ResponseEntity<List<ClienteDTO>> all(){
         return ResponseEntity.ok(
           servicioCliente.findAll().stream()
-                  .map(clienteMapper::clienteToClienteDTO).toList()
+                  .map(clienteMapper::toDto).toList()
         );
     }
 
     @PostMapping("/create")
     public ResponseEntity<ClienteDTO> create(@RequestBody ClienteDTO clienteDTO){
-        Cliente cliente =  clienteMapper.clienteDTOToCliente(clienteDTO);
+        Cliente cliente =  clienteMapper.toEntity(clienteDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(clienteMapper.clienteToClienteDTO(servicioCliente.create(cliente)));
+                .body(clienteMapper.toDto(servicioCliente.create(cliente)));
     }
 }

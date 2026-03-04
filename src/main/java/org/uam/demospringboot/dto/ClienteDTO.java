@@ -2,8 +2,8 @@ package org.uam.demospringboot.dto;
 
 import java.util.UUID;
 
-public record ClienteDTO(
-        UUID id,
+public record ClienteDTO (
+        GenericoDTO generico,
         String primerNombre,
         String primerApellido,
         String segundoNombre,

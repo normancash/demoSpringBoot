@@ -1,7 +1,7 @@
 package org.uam.demospringboot.dto;
 
 public record UsuarioDTO(
-      GenericoDTO genericoDTO,
+      GenericoDTO generico,
       String primerNombre,
       String segundoNombre,
       String primerApellido,

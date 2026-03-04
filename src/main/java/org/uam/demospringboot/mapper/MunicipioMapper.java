@@ -1,30 +1,48 @@
 package org.uam.demospringboot.mapper;
 
-import org.aspectj.lang.annotation.AfterReturning;
+
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.uam.demospringboot.dto.MunicipioDTO;
+import org.uam.demospringboot.dto.SucursalDTO;
 import org.uam.demospringboot.model.Departamento;
 import org.uam.demospringboot.model.Municipio;
+import org.uam.demospringboot.model.Sucursal;
 
-@Mapper(componentModel = "spring")
-public interface MunicipioMapper {
 
-    @Mapping(source="departamento.id",target="departamentoId")
-    MunicipioDTO toDTO(Municipio entity);
+@Mapper(config = CentralMapperConfig.class,
+        uses = {
+            EntityIdMapper.class,
+            GenericFieldMapper.class,
+        },
+        imports = {Departamento.class}
+        )
+public interface MunicipioMapper extends GenericMapper<Municipio, MunicipioDTO> {
 
-    @Mapping(target="departamento",ignore = true)
+    @Override
+    @Mapping(target="generico",source="entity"
+         ,qualifiedByName = "toGenericDTO")
+    @Mapping(target="idDepartamento",source="departamento")
+    MunicipioDTO toDto(Municipio entity);
+
+    @Override
+    @Mapping(
+            target= "id",source = "dto.generico.id"
+    )
+    @Mapping(target = "departamento",source="idDepartamento")
     Municipio toEntity(MunicipioDTO dto);
 
     @AfterMapping
-    default void setDepartamento(MunicipioDTO dto, @MappingTarget Municipio entity) {
-        if (dto.departamentoId() != null) {
-            Departamento d = new Departamento();
-            d.setId(dto.departamentoId());
-            entity.setDepartamento(d);
-        }
+    default void mapGenericFields(MunicipioDTO dto
+            , @MappingTarget Municipio entity,
+                                  GenericFieldMapper genericFieldMapper) {
+        if (dto.generico() != null) {
+            genericFieldMapper
+                    .updateEntityFromGenericoDTO(dto.generico()
+                            , entity);        }
     }
+
 
 }
